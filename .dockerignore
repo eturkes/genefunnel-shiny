@@ -1,0 +1,11 @@
+COPYING
+.gitignore
+README.md
+data
+storage
+docker-compose.yml
+.git
+.env
+nohup.out
+.Rproj.user
+genefunnel-shiny.Rproj
