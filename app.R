@@ -21,7 +21,6 @@ library(GSEABase)
 library(genefunnel)
 library(BiocParallel)
 library(future)
-library(tools)
 
 source("R/helpers.R")
 
@@ -144,7 +143,7 @@ server <- function(input, output, session) {
 
   output$download <- downloadHandler(
     filename = function() {
-      paste0("genefunnel_outputs_", Sys.Date(), ".zip")
+      paste0("genefunnel_", Sys.Date(), ".zip")
     },
     content = function(file) {
       mat <- if (is.null(input$matrix_file)) example_matrix else matrix_data()

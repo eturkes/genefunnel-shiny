@@ -19,9 +19,11 @@
 prepare_result_archive <- function(result_matrix, base_gmt_path, gene_set_dir) {
   stopifnot(file.exists(base_gmt_path), dir.exists(gene_set_dir))
 
-  base_name <- file_path_sans_ext(basename(base_gmt_path))
   zip_file <- tempfile(fileext = ".zip")
-  full_csv_path <- tempfile(pattern = "output_full_", fileext = ".csv")
+  organism_prefix <- sub(
+    "^gprofiler_full_", "", sub("\\..*", "", basename(base_gmt_path))
+  )
+  full_csv_path <- file.path(tempdir(), paste0("genefunnel_all.csv"))
 
   write.csv(result_matrix, full_csv_path)
   files_to_zip <- c(full_csv_path)
@@ -72,9 +74,12 @@ prepare_result_archive <- function(result_matrix, base_gmt_path, gene_set_dir) {
 
       if (length(overlapping_ids) >= 1) {
         subset_matrix <- result_matrix[overlapping_ids, , drop = FALSE]
-        shortname <- file_path_sans_ext(basename(subset_path))
-        subset_csv <- tempfile(
-          pattern = paste0("output_", shortname, "_"), fileext = ".csv"
+        shortname <- basename(subset_path)
+        shortname <- sub("^hsapiens\\.|^mmusculus\\.", "", shortname)
+        shortname <- sub("\\.(ENSG|name)\\.gmt$", "", shortname)
+        shortname <- gsub(":", "_", shortname)
+        subset_csv <- file.path(
+          tempdir(), paste0("genefunnel_", shortname, ".csv")
         )
         write.csv(subset_matrix, subset_csv)
         files_to_zip <- c(files_to_zip, subset_csv)
