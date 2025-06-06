@@ -48,7 +48,19 @@ prepare_result_archive <- function(result_matrix, base_gmt_path, gene_set_dir) {
 
   for (subset_path in subset_files) {
     gmt <- tryCatch({
-      getGmt(subset_path)
+      g <- getGmt(subset_path)
+
+      for (i in seq_along(g)) {
+        set_name <- g[[i]]@setName
+        description <- g[[i]]@shortDescription
+        if (!is.null(description) && nzchar(description)) {
+          suppressWarnings(
+            g[[i]]@setName <- paste0(set_name, ": ", description)
+          )
+        }
+      }
+
+      g
     }, error = function(e) {
       warning("Could not load ", subset_path, ": ", conditionMessage(e))
       return(NULL)

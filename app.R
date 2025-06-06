@@ -86,12 +86,24 @@ server <- function(input, output, session) {
   })
 
   gene_sets <- reactive({
-    if (!is.null(input$geneset_file)) {
+    gmt <- if (!is.null(input$geneset_file)) {
       getGmt(input$geneset_file$datapath)
     } else {
       gmt_path <- selected_geneset_path()
       getGmt(gmt_path)
     }
+
+    for (i in seq_along(gmt)) {
+      set_name <- gmt[[i]]@setName
+      description <- gmt[[i]]@shortDescription
+      if (!is.null(description) && nzchar(description)) {
+        suppressWarnings(
+          gmt[[i]]@setName <- paste0(set_name, ": ", description)
+        )
+      }
+    }
+
+    gmt
   })
 
   error_message <- reactiveVal(NULL)
