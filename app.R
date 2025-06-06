@@ -112,7 +112,7 @@ server <- function(input, output, session) {
   output$result_preview <- renderTable({
     req(result_data())
     head(result_data(), 10)
-  })
+  }, rownames = TRUE)
 
   output$auto_geneset_path <- renderText({
     path <- selected_geneset_path()
