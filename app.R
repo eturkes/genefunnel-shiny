@@ -21,6 +21,9 @@ library(GSEABase)
 library(genefunnel)
 library(BiocParallel)
 library(future)
+library(tools)
+
+source("R/helpers.R")
 
 example_matrix <- read.csv("data/sample_mat/human_symbol.csv", row.names = 1)
 
@@ -129,10 +132,22 @@ server <- function(input, output, session) {
 
   output$download <- downloadHandler(
     filename = function() {
-      paste0("genefunnel_result_", Sys.Date(), ".csv")
+      paste0("genefunnel_outputs_", Sys.Date(), ".zip")
     },
     content = function(file) {
-      write.csv(result_data(), file)
+      mat <- if (is.null(input$matrix_file)) example_matrix else matrix_data()
+      gmt_path <- if (!is.null(input$geneset_file)) {
+        input$geneset_file$datapath
+      } else {
+        selected_geneset_path()
+      }
+
+      zip_path <- prepare_result_archive(
+        result_matrix = result_data(),
+        base_gmt_path = gmt_path,
+        gene_set_dir = "data/gene_sets"
+      )
+      file.copy(zip_path, file, overwrite = TRUE)
     }
   )
 }
