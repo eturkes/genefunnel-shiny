@@ -19,3 +19,16 @@
 FROM rocker/rstudio:4.5.0
 
 LABEL org.opencontainers.image.authors="Emir Turkes emir.turkes@eturkes.com"
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        zlib1g-dev \
+    && Rscript -e "install.packages('shiny')" \
+        -e "install.packages('future')" \
+        -e "install.packages('BiocManager')" \
+        -e "BiocManager::install('GSEABase')" \
+        -e "BiocManager::install('eturkes/genefunnel')" \
+    && apt-get clean \
+    && rm -Rf /var/lib/apt/lists/ \
+        /tmp/downloaded_packages/ \
+        /tmp/*.rds
