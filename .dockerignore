@@ -9,3 +9,6 @@ docker-compose.yml
 nohup.out
 .Rproj.user
 genefunnel-shiny.Rproj
+www
+R
+app.R
