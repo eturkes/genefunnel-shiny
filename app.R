@@ -51,7 +51,21 @@ select_default_geneset <- function(mat) {
 ui <- fluidPage(
   useShinyjs(),
 
-  titlePanel("GeneFunnel App"),
+  tags$head(
+    tags$link(
+      href = "https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap",
+      rel = "stylesheet"
+    ),
+    tags$style(HTML("
+      .custom-title {
+        font-family: 'Permanent Marker', normal;
+        font-size: 32px;
+        margin-top: 20px;
+        margin-bottom: 10px;
+      }
+    "))
+  ),
+  div(class = "custom-title", "GeneFunnel"),
 
   sidebarLayout(
     sidebarPanel(
