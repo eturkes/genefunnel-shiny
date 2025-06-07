@@ -19,6 +19,8 @@
 library(shiny)
 source("R/helpers.R")
 
+options(shiny.maxRequestSize = 5 * 1024^3)
+
 example_matrix <- read.csv("data/sample_mat/human_symbol.csv", row.names = 1)
 
 select_default_geneset <- function(mat) {
