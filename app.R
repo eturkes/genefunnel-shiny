@@ -218,7 +218,7 @@ server <- function(input, output, session) {
       HTML(
         paste0(
           "<strong>Auto-selected gene set file:</strong> ",
-          basename(path),
+          sub("\\.qs$", ".gmt", basename(path)),
           "<br>",
           info
         )
