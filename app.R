@@ -166,7 +166,8 @@ server <- function(input, output, session) {
 
   output$result_preview <- renderTable({
     req(result_data())
-    head(result_data()[, 1:5, drop = FALSE], 15)
+    sorted <- result_data()[order(rowMeans(result_data()), decreasing = TRUE), ]
+    head(sorted[, 1:5, drop = FALSE], 15)
   }, rownames = TRUE)
 
   output$auto_matrix_path <- renderUI({
