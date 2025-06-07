@@ -26,6 +26,7 @@ RUN apt-get update \
     && Rscript -e "install.packages('shiny')" \
         -e "install.packages('future')" \
         -e "install.packages('qs')" \
+        -e "install.packages('remotes')" \
         -e "install.packages('BiocManager')" \
         -e "BiocManager::install('GSEABase')" \
         -e "BiocManager::install('eturkes/genefunnel')" \
