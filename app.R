@@ -86,6 +86,7 @@ server <- function(input, output, session) {
 
   gene_sets <- reactive({
     if (!is.null(input$geneset_file)) {
+      library(GSEABase)
       gmt <- getGmt(input$geneset_file$datapath)
       out <- geneIds(gmt)
       for (i in seq_along(gmt)) {
@@ -140,7 +141,11 @@ server <- function(input, output, session) {
 
   output$download <- downloadHandler(
     filename = function() {
-      paste0("genefunnel_", Sys.Date(), ".zip")
+      if (is.null(input$geneset_file)) {
+        paste0("genefunnel_default_genesets_", Sys.Date(), ".zip")
+      } else {
+        paste0("genefunnel_custom_geneset_", Sys.Date(), ".zip")
+      }
     },
     content = function(file) {
       mat <- if (is.null(input$matrix_file)) example_matrix else matrix_data()
@@ -150,11 +155,26 @@ server <- function(input, output, session) {
         selected_geneset_path()
       }
 
+      original_gmt_name <- if (!is.null(input$geneset_file)) {
+        input$geneset_file$name
+      } else {
+        basename(gmt_path)
+      }
+
+      zip_name <- if (is.null(input$geneset_file)) {
+        paste0("genefunnel_default_genesets_", Sys.Date(), ".zip")
+      } else {
+        paste0("genefunnel_custom_geneset_", Sys.Date(), ".zip")
+      }
+
       zip_path <- prepare_result_archive(
         result_matrix = result_data(),
-        base_qs_path = gmt_path,
-        gene_set_dir = "data/gene_sets"
+        base_gmt_path = gmt_path,
+        gene_set_dir = "data/gene_sets",
+        zip_name = zip_name,
+        original_filename = original_gmt_name
       )
+
       file.copy(zip_path, file, overwrite = TRUE)
     }
   )
