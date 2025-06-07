@@ -16,32 +16,27 @@
 #
 #    Emir Turkes can be contacted at emir.turkes@eturkes.com
 
-prepare_result_archive <- function(result_matrix, base_gmt_path, gene_set_dir) {
-  stopifnot(file.exists(base_gmt_path), dir.exists(gene_set_dir))
+prepare_result_archive <- function(result_matrix, base_qs_path, gene_set_dir) {
+  stopifnot(file.exists(base_qs_path), dir.exists(gene_set_dir))
 
   zip_file <- tempfile(fileext = ".zip")
   organism_prefix <- sub(
-    "^gprofiler_full_", "", sub("\\..*", "", basename(base_gmt_path))
+    "^gprofiler_full_", "", sub("\\..*", "", basename(base_qs_path))
   )
-  full_csv_path <- file.path(tempdir(), paste0("genefunnel_all.csv"))
+  full_csv_path <- file.path(tempdir(), "genefunnel_gprofiler_full.csv")
 
   write.csv(result_matrix, full_csv_path)
   files_to_zip <- c(full_csv_path)
 
-  base_suffix <- sub(".*\\.(ENSG|name)\\.gmt$", "\\1.gmt", base_gmt_path)
-  organism_prefix <- sub(
-    "^gprofiler_full_", "", sub("\\..*", "", basename(base_gmt_path))
-  )
-
-  all_gmts <- list.files(
+  all_qs <- list.files(
     gene_set_dir,
-    pattern = paste0("\\.", base_suffix, "$"),
+    pattern = "\\.qs$",
     full.names = TRUE
   )
 
   subset_files <- setdiff(
-    all_gmts,
-    file.path(gene_set_dir, paste0(organism_prefix, ".", base_suffix))
+    all_qs,
+    file.path(gene_set_dir, paste0("gprofiler_full_", organism_prefix, ".qs"))
   )
 
   subset_files <- subset_files[
@@ -49,34 +44,22 @@ prepare_result_archive <- function(result_matrix, base_gmt_path, gene_set_dir) {
   ]
 
   for (subset_path in subset_files) {
-    gmt <- tryCatch({
-      g <- getGmt(subset_path)
-
-      for (i in seq_along(g)) {
-        set_name <- g[[i]]@setName
-        description <- g[[i]]@shortDescription
-        if (!is.null(description) && nzchar(description)) {
-          suppressWarnings(
-            g[[i]]@setName <- paste0(set_name, ": ", description)
-          )
-        }
-      }
-
-      g
+    gene_set <- tryCatch({
+      qs::qread(subset_path)
     }, error = function(e) {
       warning("Could not load ", subset_path, ": ", conditionMessage(e))
       return(NULL)
     })
 
-    if (!is.null(gmt)) {
-      ids <- names(geneIds(gmt))
+    if (!is.null(gene_set)) {
+      ids <- names(gene_set)
       overlapping_ids <- intersect(ids, rownames(result_matrix))
 
       if (length(overlapping_ids) >= 1) {
         subset_matrix <- result_matrix[overlapping_ids, , drop = FALSE]
         shortname <- basename(subset_path)
         shortname <- sub("^hsapiens\\.|^mmusculus\\.", "", shortname)
-        shortname <- sub("\\.(ENSG|name)\\.gmt$", "", shortname)
+        shortname <- sub("\\.qs$", "", shortname)
         shortname <- gsub(":", "_", shortname)
         subset_csv <- file.path(
           tempdir(), paste0("genefunnel_", shortname, ".csv")

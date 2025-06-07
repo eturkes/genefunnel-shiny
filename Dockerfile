@@ -25,6 +25,7 @@ RUN apt-get update \
         zlib1g-dev \
     && Rscript -e "install.packages('shiny')" \
         -e "install.packages('future')" \
+        -e "install.packages('qs')" \
         -e "install.packages('BiocManager')" \
         -e "BiocManager::install('GSEABase')" \
         -e "BiocManager::install('eturkes/genefunnel')" \

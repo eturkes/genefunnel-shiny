@@ -17,10 +17,10 @@
 #    Emir Turkes can be contacted at emir.turkes@eturkes.com
 
 library(shiny)
-library(GSEABase)
 library(genefunnel)
 library(BiocParallel)
 library(future)
+library(qs)
 
 source("R/helpers.R")
 
@@ -30,9 +30,9 @@ select_default_geneset <- function(mat) {
   row_ids <- rownames(mat)
 
   if (any(grepl("^ENSG", row_ids))) {
-    return("data/gene_sets/gprofiler_full_hsapiens.ENSG.gmt")
+    return("data/gene_sets/gprofiler_full_hsapiens.ENSG.qs")
   } else if (any(grepl("^ENSMUS", row_ids))) {
-    return("data/gene_sets/gprofiler_full_mmusculus.ENSG.gmt")
+    return("data/gene_sets/gprofiler_full_mmusculus.ENSG.qs")
   } else {
     prefixes <- gsub("[0-9]+$", "", row_ids)
     cleaned <- prefixes[nchar(prefixes) >= 3 & grepl("^[A-Za-z]+$", prefixes)]
@@ -41,9 +41,9 @@ select_default_geneset <- function(mat) {
     capitalised <- sum(grepl("^[A-Z][a-z]+$", cleaned))
 
     if (all_caps >= capitalised) {
-      return("data/gene_sets/gprofiler_full_hsapiens.name.gmt")
+      return("data/gene_sets/gprofiler_full_hsapiens.name.qs")
     } else {
-      return("data/gene_sets/gprofiler_full_mmusculus.name.gmt")
+      return("data/gene_sets/gprofiler_full_mmusculus.name.qs")
     }
   }
 }
@@ -85,24 +85,21 @@ server <- function(input, output, session) {
   })
 
   gene_sets <- reactive({
-    gmt <- if (!is.null(input$geneset_file)) {
-      getGmt(input$geneset_file$datapath)
+    if (!is.null(input$geneset_file)) {
+      gmt <- getGmt(input$geneset_file$datapath)
+      out <- geneIds(gmt)
+      for (i in seq_along(gmt)) {
+        desc <- gmt[[i]]@shortDescription
+        name <- gmt[[i]]@setName
+        if (!is.null(desc) && nzchar(desc)) {
+          names(out)[i] <- paste0(name, ": ", desc)
+        }
+      }
+      return(out)
     } else {
       gmt_path <- selected_geneset_path()
-      getGmt(gmt_path)
+      qread(gmt_path)
     }
-
-    for (i in seq_along(gmt)) {
-      set_name <- gmt[[i]]@setName
-      description <- gmt[[i]]@shortDescription
-      if (!is.null(description) && nzchar(description)) {
-        suppressWarnings(
-          gmt[[i]]@setName <- paste0(set_name, ": ", description)
-        )
-      }
-    }
-
-    gmt
   })
 
   error_message <- reactiveVal(NULL)
@@ -110,7 +107,7 @@ server <- function(input, output, session) {
 
   observeEvent(input$run, {
     mat <- if (is.null(input$matrix_file)) example_matrix else matrix_data()
-    geneset_list <- geneIds(gene_sets())
+    geneset_list <- gene_sets()
     param <- MulticoreParam(availableCores())
 
     tryCatch({
@@ -155,7 +152,7 @@ server <- function(input, output, session) {
 
       zip_path <- prepare_result_archive(
         result_matrix = result_data(),
-        base_gmt_path = gmt_path,
+        base_qs_path = gmt_path,
         gene_set_dir = "data/gene_sets"
       )
       file.copy(zip_path, file, overwrite = TRUE)

@@ -21,7 +21,7 @@ version: "3"
 services:
 
   rstudio:
-    image: eturkes/genefunnel-shiny:R4.5.0v2
+    image: eturkes/genefunnel-shiny:R4.5.0v3
     volumes:
       - ".:/home/rstudio/genefunnel-shiny:rw"
     ports:
