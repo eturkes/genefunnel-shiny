@@ -17,11 +17,6 @@
 #    Emir Turkes can be contacted at emir.turkes@eturkes.com
 
 library(shiny)
-library(genefunnel)
-library(BiocParallel)
-library(future)
-library(qs)
-
 source("R/helpers.R")
 
 example_matrix <- read.csv("data/sample_mat/human_symbol.csv", row.names = 1)
@@ -86,9 +81,8 @@ server <- function(input, output, session) {
 
   gene_sets <- reactive({
     if (!is.null(input$geneset_file)) {
-      library(GSEABase)
-      gmt <- getGmt(input$geneset_file$datapath)
-      out <- geneIds(gmt)
+      gmt <- GSEABase::getGmt(input$geneset_file$datapath)
+      out <- GSEABase::geneIds(gmt)
       for (i in seq_along(gmt)) {
         desc <- gmt[[i]]@shortDescription
         name <- gmt[[i]]@setName
@@ -99,7 +93,7 @@ server <- function(input, output, session) {
       return(out)
     } else {
       gmt_path <- selected_geneset_path()
-      qread(gmt_path)
+      qs::qread(gmt_path)
     }
   })
 
@@ -109,10 +103,10 @@ server <- function(input, output, session) {
   observeEvent(input$run, {
     mat <- if (is.null(input$matrix_file)) example_matrix else matrix_data()
     geneset_list <- gene_sets()
-    param <- MulticoreParam(availableCores())
+    param <- BiocParallel::MulticoreParam(future::availableCores())
 
     tryCatch({
-      res <- genefunnel(mat, geneset_list, BPPARAM = param)
+      res <- genefunnel::genefunnel(mat, geneset_list, BPPARAM = param)
       result_data(res)
       error_message(NULL)
     }, error = function(e) {
