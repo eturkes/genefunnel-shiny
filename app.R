@@ -17,6 +17,7 @@
 #    Emir Turkes can be contacted at emir.turkes@eturkes.com
 
 library(shiny)
+library(shinyjs)
 source("R/helpers.R")
 
 options(shiny.maxRequestSize = 5 * 1024^3)
@@ -48,6 +49,8 @@ select_default_geneset <- function(mat) {
 }
 
 ui <- fluidPage(
+  useShinyjs(),
+
   titlePanel("GeneFunnel App"),
 
   sidebarLayout(
@@ -64,7 +67,7 @@ ui <- fluidPage(
         column(
           width = 4,
           div(
-            style = "text-align: center;",
+            style = "display: flex; align-items: center; gap: 10px;",
             actionButton(
               "run",
               tagList(
@@ -74,16 +77,30 @@ ui <- fluidPage(
                 "Run GeneFunnel"
               ),
               class = "btn-primary"
+            ),
+            div(
+              id = "run_spinner",
+              style = "display: none;",
+              tags$i(
+                class = "fa fa-spinner fa-spin",
+                style = "font-size: 18px; color: #007bff;"
+              )
             )
           )
         ),
         column(
           width = 8,
           div(
-            style = "text-align: center;",
-            downloadButton(
-              "download_example_matrix", "Download Example Matrix"
-            )
+            style = "display: flex; justify-content: flex-end; align-items: center; gap: 10px;",
+            div(
+              id = "example_spinner",
+              style = "display: none;",
+              tags$i(
+                class = "fa fa-spinner fa-spin",
+                style = "font-size: 18px; color: #007bff;"
+              )
+            ),
+            downloadButton("download_example_matrix", "Download Example Matrix")
           )
         )
       ),
@@ -92,14 +109,30 @@ ui <- fluidPage(
         column(
           width = 4,
           div(
-            style = "text-align: center;",
-            downloadButton("download", "Download Results")
+            style = "display: flex; align-items: center; gap: 10px;",
+            downloadButton("download", "Download Results"),
+            div(
+              id = "download_spinner",
+              style = "display: none;",
+              tags$i(
+                class = "fa fa-spinner fa-spin",
+                style = "font-size: 18px; color: #007bff;"
+              )
+            )
           )
         ),
         column(
           width = 8,
           div(
-            style = "text-align: center;",
+            style = "display: flex; justify-content: flex-end; align-items: center; gap: 10px;",
+            div(
+              id = "default_spinner",
+              style = "display: none;",
+              tags$i(
+                class = "fa fa-spinner fa-spin",
+                style = "font-size: 18px; color: #007bff;"
+              )
+            ),
             downloadButton(
               "download_default_genesets", "Download Default Gene Sets"
             )
@@ -186,6 +219,9 @@ server <- function(input, output, session) {
   result_data <- reactiveVal(NULL)
 
   observeEvent(input$run, {
+    shinyjs::show("run_spinner")
+    on.exit(shinyjs::hide("run_spinner"), add = TRUE)
+
     mat <- if (is.null(input$matrix_file)) example_matrix else matrix_data()
     geneset_list <- gene_sets()
     param <- BiocParallel::MulticoreParam(future::availableCores())
@@ -281,6 +317,9 @@ server <- function(input, output, session) {
       }
     },
     content = function(file) {
+      shinyjs::show("download_spinner")
+      on.exit(shinyjs::hide("download_spinner"), add = TRUE)
+
       mat <- if (is.null(input$matrix_file)) example_matrix else matrix_data()
       gmt_path <- if (!is.null(input$geneset_file)) {
         input$geneset_file$datapath
@@ -325,6 +364,9 @@ server <- function(input, output, session) {
       )
     },
     content = function(file) {
+      shinyjs::show("example_spinner")
+      on.exit(shinyjs::hide("example_spinner"), add = TRUE)
+
       temp <- tempfile(fileext = ".csv")
       file.copy("data/sample_mat/otero-garcia-pseudobulk.csv", temp)
       utils::zip(zipfile = file, files = temp, flags = "-j")
@@ -338,10 +380,18 @@ server <- function(input, output, session) {
       )
     },
     content = function(file) {
+      shinyjs::show("default_spinner")
+      on.exit(shinyjs::hide("default_spinner"), add = TRUE)
+
       tmpdir <- tempfile()
       dir.create(tmpdir)
-      file.copy(list.files("data/gene_sets_download", full.names = TRUE), tmpdir)
-      utils::zip(zipfile = file, files = list.files(tmpdir, full.names = TRUE), flags = "-j")
+      file.copy(
+        list.files("data/gene_sets_download", full.names = TRUE), tmpdir
+      )
+      utils::zip(
+        zipfile = file, files = list.files(tmpdir, full.names = TRUE),
+        flags = "-j"
+      )
     }
   )
 }

@@ -24,6 +24,7 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         zlib1g-dev \
     && Rscript -e "install.packages('shiny')" \
+        -e "install.packages('shinyjs')" \
         -e "install.packages('future')" \
         -e "install.packages('qs')" \
         -e "install.packages('remotes')" \
