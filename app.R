@@ -83,14 +83,37 @@ ui <- fluidPage(
     )
   ),
   tags$div(
-    style = "text-align: center; margin-top: 50px; margin-bottom: 30px;",
+    style = "display: flex; justify-content: space-between; align-items: center; padding: 40px 20px 20px 20px;",
+
     tags$div(
-      style = "display: inline-block; margin: 0 20px;",
-      tags$img(src = "ucl-logo.png", height = "80px")
+      style = "display: flex; gap: 20px;",
+      tags$img(src = "ucl-logo.png", height = "60px"),
+      tags$img(src = "ukdri-logo.jpg", height = "60px")
     ),
+
     tags$div(
-      style = "display: inline-block; margin: 0 20px;",
-      tags$img(src = "ukdri-logo.jpg", height = "80px")
+      style = "text-align: right;",
+      tags$p(
+        tags$a(
+          href = "https://forms.gle/Nzy5KyQoC9F5KVFA9",
+          target = "_blank", "Submit Feedback"
+        ),
+        style = "margin-bottom: 6px; display: block;"
+      ),
+      tags$p(
+        tags$a(
+          href = "https://drive.google.com/file/d/1Q7wc8Ct7OkSdv6tB0HqjLDsQQ3NVCJnw/view?usp=sharing",
+          target = "_blank", "Temporary Citation Info (Thesis)"
+        ),
+        style = "margin-bottom: 6px; display: block;"
+      ),
+      tags$p(
+        tags$a(
+          href = "https://github.com/eturkes/genefunnel-shiny",
+          target = "_blank", "Source Code & Change Log"
+        ),
+        style = "margin: 0;"
+      )
     )
   )
 )
