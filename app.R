@@ -81,6 +81,17 @@ ui <- fluidPage(
       h4("Output Preview"),
       tableOutput("result_preview")
     )
+  ),
+  tags$div(
+    style = "text-align: center; margin-top: 50px; margin-bottom: 30px;",
+    tags$div(
+      style = "display: inline-block; margin: 0 20px;",
+      tags$img(src = "ucl-logo.png", height = "80px")
+    ),
+    tags$div(
+      style = "display: inline-block; margin: 0 20px;",
+      tags$img(src = "ukdri-logo.jpg", height = "80px")
+    )
   )
 )
 
