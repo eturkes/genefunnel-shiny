@@ -65,7 +65,31 @@ ui <- fluidPage(
       }
     "))
   ),
-  div(class = "custom-title", "GeneFunnel"),
+
+  tags$div(
+    style = "display: flex; justify-content: space-between; align-items: center; padding: 10px 30px;",
+    tags$div(
+      style = "font-family: 'Permanent Marker', cursive; font-size: 30px;",
+      "GeneFunnel"
+    ),
+    tags$div(
+      style = "font-size: 14px; text-align: center;",
+      HTML(paste(
+        "<a href='https://forms.gle/Nzy5KyQoC9F5KVFA9' target='_blank' style='margin: 0 10px;'>Submit Feedback</a>",
+        "|",
+        "<a href='https://drive.google.com/file/d/1Q7wc8Ct7OkSdv6tB0HqjLDsQQ3NVCJnw/view?usp=sharing' target='_blank' style='margin: 0 10px;'>Citation Info</a>",
+        "|",
+        "<a href='https://github.com/eturkes/genefunnel-shiny' target='_blank' style='margin: 0 10px;'>Source Code</a>",
+        "|",
+        "<a href='https://data.duff-lab.org/app/genefunnel-benchmarks-viewer' target='_blank' style='margin: 0 10px;'>Interactive Benchmarking</a>"
+      ))
+    ),
+    tags$div(
+      style = "display: flex; gap: 10px;",
+      tags$img(src = "ucl-logo.png", height = "40px"),
+      tags$img(src = "ukdri-logo.jpg", height = "40px")
+    )
+  ),
 
   sidebarLayout(
     sidebarPanel(
