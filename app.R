@@ -21,7 +21,9 @@ source("R/helpers.R")
 
 options(shiny.maxRequestSize = 5 * 1024^3)
 
-example_matrix <- read.csv("data/sample_mat/human_symbol.csv", row.names = 1)
+example_matrix <- read.csv(
+  "data/sample_mat/human_ensembl_example.csv", row.names = 1
+)
 
 select_default_geneset <- function(mat) {
   row_ids <- rownames(mat)
@@ -53,12 +55,25 @@ ui <- fluidPage(
       fileInput(
         "matrix_file", "Upload Gene × Sample Matrix (CSV)", accept = ".csv"
       ),
-      fileInput("geneset_file", "Upload Gene Sets (GMT)", accept = ".gmt"),
-      actionButton("run", "Run GeneFunnel"),
-      br(), br(),
-      textOutput("auto_geneset_path"),
+      fileInput("geneset_file", "Upload Gene Set File (GMT)", accept = ".gmt"),
+      uiOutput("auto_matrix_path"),
+      uiOutput("auto_geneset_path"),
+      br(),
+      actionButton(
+        "run",
+        tagList(
+          tags$span(icon("play"), style = "margin-right: 5px; margin-left: 2px"),
+          "Run GeneFunnel"
+        )
+      ),
       verbatimTextOutput("error_text"),
-      downloadButton("download", "Download Result")
+      actionButton(
+        "download",
+        tagList(
+          tags$span(icon("download"), style = "margin-right: 3px;"),
+          "Download Results"
+        )
+      ),
     ),
     mainPanel(
       h4("Output Preview"),
@@ -122,12 +137,47 @@ server <- function(input, output, session) {
     head(result_data(), 10)
   }, rownames = TRUE)
 
-  output$auto_geneset_path <- renderText({
+  output$auto_matrix_path <- renderUI({
+    if (is.null(input$matrix_file)) {
+      HTML(
+        paste0(
+          "<strong>Using example matrix:</strong> ",
+          "human_ensembl_example.csv"
+        )
+      )
+    } else {
+      HTML(
+        paste0(
+          "<strong>User-supplied matrix file:</strong> ",
+          input$matrix_file$name
+        )
+      )
+    }
+  })
+
+  output$auto_geneset_path <- renderUI({
     path <- selected_geneset_path()
     if (is.null(path)) {
-      "User-supplied gene set file"
+      HTML(
+        paste0(
+          "<strong>User-supplied gene set file:</strong> ",
+          input$geneset_file$name
+        )
+      )
     } else {
-      paste("Auto-selected gene set:", basename(path))
+      HTML(
+        paste0(
+          "<strong>Auto-selected gene set file:</strong> ",
+          basename(path), "<br>",
+          "<em>",
+          "Includes all gene sets available at ",
+          "<a href='https://biit.cs.ut.ee/gprofiler/gost' target='_blank'>g:Profiler</a> ",
+          "(concatenated and separate).<br>",
+          "Human and mouse species supported.<br>",
+          "Standard gene symbols and ENSEMBL IDs supported.",
+          "</em>"
+        )
+      )
     }
   })
 
@@ -140,7 +190,7 @@ server <- function(input, output, session) {
       if (is.null(input$geneset_file)) {
         paste0("genefunnel_default_genesets_", Sys.Date(), ".zip")
       } else {
-        paste0("genefunnel_custom_geneset_", Sys.Date(), ".zip")
+        paste0("genefunnel_custom_genesets_", Sys.Date(), ".zip")
       }
     },
     content = function(file) {
@@ -160,7 +210,7 @@ server <- function(input, output, session) {
       zip_name <- if (is.null(input$geneset_file)) {
         paste0("genefunnel_default_genesets_", Sys.Date(), ".zip")
       } else {
-        paste0("genefunnel_custom_geneset_", Sys.Date(), ".zip")
+        paste0("genefunnel_custom_genesets_", Sys.Date(), ".zip")
       }
 
       zip_path <- prepare_result_archive(
