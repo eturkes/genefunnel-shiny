@@ -269,9 +269,15 @@ server <- function(input, output, session) {
   output$download <- downloadHandler(
     filename = function() {
       if (is.null(input$geneset_file)) {
-        paste0("genefunnel_default_genesets_", Sys.Date(), ".zip")
+        paste0(
+          "genefunnel_default_genesets_", format(Sys.Date(), "%Y_%m_%d"),
+          ".zip"
+        )
       } else {
-        paste0("genefunnel_custom_genesets_", Sys.Date(), ".zip")
+        paste0(
+          "genefunnel_custom_genesets_", format(Sys.Date(), "%Y_%m_%d"),
+          ".zip"
+        )
       }
     },
     content = function(file) {
@@ -289,9 +295,15 @@ server <- function(input, output, session) {
       }
 
       zip_name <- if (is.null(input$geneset_file)) {
-        paste0("genefunnel_default_genesets_", Sys.Date(), ".zip")
+        paste0(
+          "genefunnel_default_genesets_", format(Sys.Date(), "%Y_%m_%d"),
+          ".zip"
+        )
       } else {
-        paste0("genefunnel_custom_genesets_", Sys.Date(), ".zip")
+        paste0(
+          "genefunnel_custom_genesets_", format(Sys.Date(), "%Y_%m_%d"),
+          ".zip"
+        )
       }
 
       zip_path <- prepare_result_archive(
@@ -308,7 +320,9 @@ server <- function(input, output, session) {
 
   output$download_example_matrix <- downloadHandler(
     filename = function() {
-      paste0("genefunnel_example_matrix_", Sys.Date(), ".zip")
+      paste0(
+        "genefunnel_example_matrix_", format(Sys.Date(), "%Y_%m_%d"), ".zip"
+      )
     },
     content = function(file) {
       temp <- tempfile(fileext = ".csv")
@@ -319,7 +333,9 @@ server <- function(input, output, session) {
 
   output$download_default_genesets <- downloadHandler(
     filename = function() {
-      paste0("genefunnel_default_genesets_", Sys.Date(), ".zip")
+      paste0(
+        "genefunnel_default_genesets_", format(Sys.Date(), "%Y_%m_%d"), ".zip"
+      )
     },
     content = function(file) {
       tmpdir <- tempfile()
