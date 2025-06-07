@@ -297,7 +297,7 @@ server <- function(input, output, session) {
       "<li>QC not required (can be applied after obtaining all results, does not affect accuracy).</li>",
       "<li>Preferably unprocessed data (i.e. no log-transform, normalisation, etc., but not a hard requirement).</li>",
       "<li>Output resembles the distribution of the input data and similar pipelines can be applied for analysis.</li>",
-      "<li>Proteomics, metabolomics, etc. all supported, but needs gene set file if below criteria not met.</li>",
+      "<li>Proteomics, metabolomics, etc. all supported, but may need a custom gene set file (see below).</li>",
       "</ul>",
       sep = "\n"
     )
@@ -311,7 +311,11 @@ server <- function(input, output, session) {
       HTML(
         paste0(
           "<strong>User-supplied gene set file:</strong> ",
-          input$geneset_file$name
+          input$geneset_file$name,
+          "<br>",
+          "<ul style='font-style: italic; padding-left: 0; list-style-position: inside;'>",
+          "<li>Gene sets are only scored if all features are present in the input matrix.</li>",
+          "</ul>"
         )
       )
     } else {
@@ -322,7 +326,7 @@ server <- function(input, output, session) {
         "<li>Human and mouse species supported.</li>",
         "<li>Standard gene symbols and ENSEMBL IDs supported.</li>",
         "<li>Gene sets are only scored if all features are present in the input matrix.</li>",
-        "<li>If these criteria not met, or interested in custom sets, try submitting your own in the GMT format.</li>",
+        "<li>If these criteria not met, or you're interested in custom sets, try submitting your own in GMT format.</li>",
         "</ul>",
         sep = "\n"
       )
