@@ -22,7 +22,7 @@ source("R/helpers.R")
 options(shiny.maxRequestSize = 5 * 1024^3)
 
 example_matrix <- read.csv(
-  "data/sample_mat/human_ensembl_example.csv", row.names = 1
+  "data/sample_mat/otero-garcia-pseudobulk.csv", row.names = 1
 )
 
 select_default_geneset <- function(mat) {
@@ -171,7 +171,7 @@ server <- function(input, output, session) {
 
   output$auto_matrix_path <- renderUI({
     header <- if (is.null(input$matrix_file)) {
-      "<strong>Using example matrix:</strong> human_ensembl_example.csv"
+      "<strong>Using example matrix:</strong> otero-garcia-pseudobulk.csv"
     } else {
       paste0("<strong>User-supplied matrix file:</strong> ", input$matrix_file$name)
     }
