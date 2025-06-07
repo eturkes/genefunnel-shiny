@@ -134,7 +134,7 @@ server <- function(input, output, session) {
 
   output$result_preview <- renderTable({
     req(result_data())
-    head(result_data(), 10)
+    head(result_data()[, 1:5, drop = FALSE], 10)
   }, rownames = TRUE)
 
   output$auto_matrix_path <- renderUI({
