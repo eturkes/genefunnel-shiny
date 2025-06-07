@@ -52,6 +52,10 @@ ui <- fluidPage(
   useShinyjs(),
 
   tags$head(
+    tags$title("GeneFunnel App")
+  ),
+
+  tags$head(
     tags$link(
       href = "https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap",
       rel = "stylesheet"
