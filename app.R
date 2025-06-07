@@ -60,17 +60,53 @@ ui <- fluidPage(
       uiOutput("auto_matrix_path"),
       uiOutput("auto_geneset_path"),
       br(),
-      actionButton(
-        "run",
-        tagList(
-          tags$span(
-            icon("play"), style = "margin-right: 2px; margin-left: 2px"
-          ),
-          "Run GeneFunnel"
+      fluidRow(
+        column(
+          width = 4,
+          div(
+            style = "text-align: center;",
+            actionButton(
+              "run",
+              tagList(
+                tags$span(
+                  icon("play"), style = "margin-right: 2px; margin-left: 2px"
+                ),
+                "Run GeneFunnel"
+              ),
+              class = "btn-primary"
+            )
+          )
+        ),
+        column(
+          width = 8,
+          div(
+            style = "text-align: center;",
+            downloadButton(
+              "download_example_matrix", "Download Example Matrix"
+            )
+          )
         )
       ),
-      verbatimTextOutput("error_text"),
-      downloadButton("download", "Download Result")
+      div(style = "margin-top: 5px;"),
+      fluidRow(
+        column(
+          width = 4,
+          div(
+            style = "text-align: center;",
+            downloadButton("download", "Download Results")
+          )
+        ),
+        column(
+          width = 8,
+          div(
+            style = "text-align: center;",
+            downloadButton(
+              "download_default_genesets", "Download Default Gene Sets"
+            )
+          )
+        )
+      ),
+      verbatimTextOutput("error_text")
     ),
     mainPanel(
       width = 7,
@@ -267,6 +303,29 @@ server <- function(input, output, session) {
       )
 
       file.copy(zip_path, file, overwrite = TRUE)
+    }
+  )
+
+  output$download_example_matrix <- downloadHandler(
+    filename = function() {
+      paste0("genefunnel_example_matrix_", Sys.Date(), ".zip")
+    },
+    content = function(file) {
+      temp <- tempfile(fileext = ".csv")
+      file.copy("data/sample_mat/otero-garcia-pseudobulk.csv", temp)
+      utils::zip(zipfile = file, files = temp, flags = "-j")
+    }
+  )
+
+  output$download_default_genesets <- downloadHandler(
+    filename = function() {
+      paste0("genefunnel_default_genesets_", Sys.Date(), ".zip")
+    },
+    content = function(file) {
+      tmpdir <- tempfile()
+      dir.create(tmpdir)
+      file.copy(list.files("data/gene_sets_download", full.names = TRUE), tmpdir)
+      utils::zip(zipfile = file, files = list.files(tmpdir, full.names = TRUE), flags = "-j")
     }
   )
 }
