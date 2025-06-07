@@ -63,18 +63,14 @@ ui <- fluidPage(
       actionButton(
         "run",
         tagList(
-          tags$span(icon("play"), style = "margin-right: 5px; margin-left: 2px"),
+          tags$span(
+            icon("play"), style = "margin-right: 2px; margin-left: 2px"
+          ),
           "Run GeneFunnel"
         )
       ),
       verbatimTextOutput("error_text"),
-      actionButton(
-        "download",
-        tagList(
-          tags$span(icon("download"), style = "margin-right: 3px;"),
-          "Download Results"
-        )
-      ),
+      downloadButton("download", "Download Result")
     ),
     mainPanel(
       width = 7,
