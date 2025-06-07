@@ -97,10 +97,14 @@ ui <- fluidPage(
       fileInput(
         "matrix_file", "Upload Gene × Sample Matrix (CSV)", accept = ".csv"
       ),
-      fileInput("geneset_file", "Upload Gene Set File (GMT)", accept = ".gmt"),
+      div(style = "margin-top: -15px"),
+      fileInput(
+        "geneset_file", "Upload Gene Set File (GMT)", accept = ".gmt"
+      ),
+      div(style = "margin-top: -15px"),
       uiOutput("auto_matrix_path"),
       uiOutput("auto_geneset_path"),
-      br(),
+      div(style = "margin-top: 20px"),
       fluidRow(
         column(
           width = 4,
@@ -177,6 +181,7 @@ ui <- fluidPage(
           )
         )
       ),
+      div(style = "margin-top: 5px;"),
       verbatimTextOutput("error_text")
     ),
     mainPanel(
