@@ -106,7 +106,7 @@ ui <- fluidPage(
       tags$p(
         tags$a(
           href = "https://github.com/eturkes/genefunnel-shiny",
-          target = "_blank", "Source Code & Change Log"
+          target = "_blank", "Source Code & Documentation"
         ),
         style = "margin: 0;"
       )
