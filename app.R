@@ -316,6 +316,7 @@ server <- function(input, output, session) {
         "<a href='https://biit.cs.ut.ee/gprofiler/gost' target='_blank'>g:Profiler</a> (concatenated and separate).</li>",
         "<li>Human and mouse species supported.</li>",
         "<li>Standard gene symbols and ENSEMBL IDs supported.</li>",
+        "<li>Gene sets are only scored if all features are present in the input matrix.</li>",
         "<li>If these criteria not met, or interested in custom sets, try submitting your own in the GMT format.</li>",
         "</ul>",
         sep = "\n"
