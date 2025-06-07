@@ -174,7 +174,9 @@ server <- function(input, output, session) {
     header <- if (is.null(input$matrix_file)) {
       "<strong>Using example matrix:</strong> otero-garcia-pseudobulk.csv"
     } else {
-      paste0("<strong>User-supplied matrix file:</strong> ", input$matrix_file$name)
+      paste0(
+        "<strong>User-supplied matrix file:</strong> ", input$matrix_file$name
+      )
     }
 
     details <- paste(
