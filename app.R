@@ -52,6 +52,7 @@ ui <- fluidPage(
 
   sidebarLayout(
     sidebarPanel(
+      width = 5,
       fileInput(
         "matrix_file", "Upload Gene × Sample Matrix (CSV)", accept = ".csv"
       ),
@@ -76,6 +77,7 @@ ui <- fluidPage(
       ),
     ),
     mainPanel(
+      width = 7,
       h4("Output Preview"),
       tableOutput("result_preview")
     )
@@ -134,25 +136,29 @@ server <- function(input, output, session) {
 
   output$result_preview <- renderTable({
     req(result_data())
-    head(result_data()[, 1:5, drop = FALSE], 10)
+    head(result_data()[, 1:5, drop = FALSE], 15)
   }, rownames = TRUE)
 
   output$auto_matrix_path <- renderUI({
-    if (is.null(input$matrix_file)) {
-      HTML(
-        paste0(
-          "<strong>Using example matrix:</strong> ",
-          "human_ensembl_example.csv"
-        )
-      )
+    header <- if (is.null(input$matrix_file)) {
+      "<strong>Using example matrix:</strong> human_ensembl_example.csv"
     } else {
-      HTML(
-        paste0(
-          "<strong>User-supplied matrix file:</strong> ",
-          input$matrix_file$name
-        )
-      )
+      paste0("<strong>User-supplied matrix file:</strong> ", input$matrix_file$name)
     }
+
+    details <- paste(
+      "<ul style='font-style: italic; padding-left: 0; list-style-position: inside;'>",
+      "<li>CSV uploads must be non-negative and all numerical (but zeros, missing values, NA values are OK).</li>",
+      "<li>5GB file size limit, will be increasing this to 30GB or so soon.</li>",
+      "<li>QC not required (can be applied after obtaining all results, does not affect accuracy).</li>",
+      "<li>Preferably unprocessed data (i.e. no log-transform, normalisation, etc., but not a hard requirement).</li>",
+      "<li>Output resembles the distribution of the input data and similar pipelines can be applied for analysis.</li>",
+      "<li>Proteomics, metabolomics, etc. all supported, but needs gene set file if below criteria not met.</li>",
+      "</ul>",
+      sep = "\n"
+    )
+
+    HTML(paste(header, details, sep = "<br/>"))
   })
 
   output$auto_geneset_path <- renderUI({
@@ -165,17 +171,23 @@ server <- function(input, output, session) {
         )
       )
     } else {
+      info <- paste(
+        "<ul style='font-style: italic; padding-left: 0; list-style-position: inside;'>",
+        "<li>Includes all gene sets available at ",
+        "<a href='https://biit.cs.ut.ee/gprofiler/gost' target='_blank'>g:Profiler</a> (concatenated and separate).</li>",
+        "<li>Human and mouse species supported.</li>",
+        "<li>Standard gene symbols and ENSEMBL IDs supported.</li>",
+        "<li>If these criteria not met, or interested in custom sets, try submitting your own in the GMT format.</li>",
+        "</ul>",
+        sep = "\n"
+      )
+
       HTML(
         paste0(
           "<strong>Auto-selected gene set file:</strong> ",
-          basename(path), "<br>",
-          "<em>",
-          "Includes all gene sets available at ",
-          "<a href='https://biit.cs.ut.ee/gprofiler/gost' target='_blank'>g:Profiler</a> ",
-          "(concatenated and separate).<br>",
-          "Human and mouse species supported.<br>",
-          "Standard gene symbols and ENSEMBL IDs supported.",
-          "</em>"
+          basename(path),
+          "<br>",
+          info
         )
       )
     }
