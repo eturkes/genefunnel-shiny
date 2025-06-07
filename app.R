@@ -162,36 +162,32 @@ ui <- fluidPage(
     )
   ),
   tags$div(
-    style = "display: flex; justify-content: space-between; align-items: center; padding: 40px 20px 20px 20px;",
-
-    tags$div(
-      style = "display: flex; gap: 20px;",
-      tags$img(src = "ucl-logo.png", height = "60px"),
-      tags$img(src = "ukdri-logo.jpg", height = "60px")
-    ),
-
-    tags$div(
-      style = "text-align: right;",
-      tags$p(
-        tags$a(
-          href = "https://forms.gle/Nzy5KyQoC9F5KVFA9",
-          target = "_blank", "Submit Feedback"
+    style = "padding: 0px 20px 40px 20px;",
+    withMathJax(
+      fluidRow(
+        column(
+          width = 5,
+          tags$div(
+            style = "padding-right: 20px;",
+            tags$h4("Mathematical Description of GeneFunnel"),
+            tags$p("The scoring formula of GeneFunnel is:"),
+            withMathJax("$$
+      \\text{score}_{k,j} = \\sum_{i \\in G_k} X_{i,j} - \\left( \\frac{|G_k|}{2(|G_k| - 1)} \\sum_{i \\in G_k} \\left| X_{i,j} - \\bar{X}_{G_k,j} \\right| \\right)
+    $$"),
+            tags$p(HTML("Here, <span class='mathjax-inline'>\\(\\sum_{i \\in G_k} X_{i,j}\\)</span> is the sum of the expression levels for the features in gene set <span class='mathjax-inline'>\\(G_k\\)</span> for sample <span class='mathjax-inline'>\\(j\\)</span>.")),
+            tags$p(HTML("<span class='mathjax-inline'>\\(\\bar{X}_{G_k,j}\\)</span> is the mean expression of the features in gene set <span class='mathjax-inline'>\\(G_k\\)</span> for sample <span class='mathjax-inline'>\\(j\\)</span>.")),
+            tags$p(HTML("<span class='mathjax-inline'>\\(\\sum_{i \\in G_k} | X_{i,j} - \\bar{X}_{G_k,j} |\\)</span> is the sum of the absolute deviations from the mean.")),
+            tags$p(HTML("<span class='mathjax-inline'>\\(\\frac{|G_k|}{2(|G_k| - 1)}\\)</span> is the scaling factor, which adjusts the influence of deviation."))
+          )
         ),
-        style = "margin-bottom: 6px; display: block;"
-      ),
-      tags$p(
-        tags$a(
-          href = "https://drive.google.com/file/d/1Q7wc8Ct7OkSdv6tB0HqjLDsQQ3NVCJnw/view?usp=sharing",
-          target = "_blank", "Temporary Citation Info (Thesis)"
-        ),
-        style = "margin-bottom: 6px; display: block;"
-      ),
-      tags$p(
-        tags$a(
-          href = "https://github.com/eturkes/genefunnel-shiny",
-          target = "_blank", "Source Code & Documentation"
-        ),
-        style = "margin: 0;"
+        column(
+          width = 7,
+          tags$h4("In Plain English"),
+          tags$p("GeneFunnel is a tool for gene set enrichment (or functional class scoring to be more precise). It takes as input a matrix of genes/proteins (generally referred to as features) and samples, for example the output of an (sc)RNAseq or mass-spectrometry proteomics experiment. Also required is a gene set list, such as from the Gene Ontology (GO), where each element is a set of genes with a name for each set."),
+          tags$p("GeneFunnel iterates through samples in the matrix. For each sample, the feature list is iterated through and matched against sets in the gene list. The matrix is subset and scored accordingly."),
+          tags$p("The score is derived by taking the sum of matched features and subtracting the scaled absolute deviation from the mean. The use of absolute value ensures both negative and positive deviations are penalised."),
+          tags$p("The scaling factor accounts for the number of features and adjusts the penalty based on gene set size. This ensures the score is highest when features are tightly clustered around the mean, and zero in the case of maximal deviance.")
+        )
       )
     )
   )
